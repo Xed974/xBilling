@@ -9,8 +9,8 @@ AddEventHandler('xBilling:facture', function(target, raison, amount, society)
     local xIdentifier = xPlayer.getIdentifier()
     local tIdentifier = xTarget.getIdentifier()
 
-    if (not xIdentifier) then return else
-        if (not tIdentifier) then return else
+    if (not xIdentifier) then return end
+        if (not tIdentifier) then return end
             MySQL.Async.execute("INSERT INTO xBilling (identifier, sender, raison, amount, society) VALUES (@identifier, @sender, @raison, @amount, @society)", {
                 ['@identifier'] = tIdentifier,
                 ['@sender'] = xIdentifier,
@@ -19,8 +19,6 @@ AddEventHandler('xBilling:facture', function(target, raison, amount, society)
                 ['society'] = society
             }, function()end)
             TriggerClientEvent('esx:showNotification', xTarget.source, 'Vous avez reçu une facture !')
-        end
-    end
 end)
 
 --
@@ -30,7 +28,7 @@ AddEventHandler('xBilling:tcheckfacture', function()
     local source = source
     local xPlayer = ESX.GetPlayerFromId(source)
 
-    if (not xPlayer) then return else
+    if (not xPlayer) then return end
         MySQL.Async.fetchAll("SELECT * FROM xBilling WHERE identifier = @identifier", {
             ['@identifier'] = xPlayer.getIdentifier()
         }, function(result)
@@ -39,7 +37,6 @@ AddEventHandler('xBilling:tcheckfacture', function()
                 TriggerClientEvent('xBilling:resultfacture', source, resultServer)
             end
         end)
-    end
 end)
 
 RegisterNetEvent('xBilling:payercb')
@@ -48,7 +45,7 @@ AddEventHandler('xBilling:payercb', function(amount, society, id, sender)
     local xPlayer = ESX.GetPlayerFromId(source)
     local xTarget = ESX.GetPlayerFromIdentifier(sender)
     
-    if (not xPlayer) then return else
+    if (not xPlayer) then return end
         if xPlayer.getAccount('bank').money >= amount then
             MySQL.Async.execute("DELETE FROM xBilling WHERE id = "..id.."", {}, function(rowsChanged)
                 TriggerEvent('esx_addonaccount:getSharedAccount', society, function(account)
@@ -61,7 +58,6 @@ AddEventHandler('xBilling:payercb', function(amount, society, id, sender)
         else
             TriggerClientEvent('esx:showAdvancedNotification', source, 'Fleeca Bank', 'Paiement refusé', 'Vous n\'avez pas assez d\'argent sur votre compte !', 'CHAR_BANK_FLEECA', 1)
         end
-    end
 end)
 
 RegisterNetEvent('xBilling:payere')
@@ -70,7 +66,7 @@ AddEventHandler('xBilling:payere', function(amount, society, id, sender)
     local xPlayer = ESX.GetPlayerFromId(source)
     local xTarget = ESX.GetPlayerFromIdentifier(sender)
 
-    if (not xPlayer) then return else
+    if (not xPlayer) then return end
         if xPlayer.getMoney() >= amount then
             MySQL.Async.execute("DELETE FROM xBilling WHERE id = "..id.."", {}, function(rowsChanged)
                 TriggerEvent('esx_addonaccount:getSharedAccount', society, function(account)
@@ -83,7 +79,6 @@ AddEventHandler('xBilling:payere', function(amount, society, id, sender)
         else
             TriggerClientEvent('esx:showNotification', source, 'Vous n\'avez pas assez d\'argent sur vous !')
         end
-    end
 end)
 
 --- Xed#1188
