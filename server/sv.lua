@@ -47,12 +47,12 @@ AddEventHandler('xBilling:payercb', function(amount, society, id, sender)
     
     if (not xPlayer) then return end
     if xPlayer.getAccount('bank').money >= amount then
+        xPlayer.removeAccountMoney('bank', amount)
+        TriggerClientEvent('esx:showAdvancedNotification', source, 'Fleeca Bank', 'Virement', ('Virement de ~g~%s$~s~ effectué avec succès !'):format(amount), 'CHAR_BANK_FLEECA', 1)
+        TriggerClientEvent('esx:showAdvancedNotification', xTarget.source, 'Fleeca Bank', 'Virement', ('L\'entreprise à reçu un virement de ~g~%s$~s~ !'):format(amount), 'CHAR_BANK_FLEECA', 1)
         MySQL.Async.execute("DELETE FROM xBilling WHERE id = "..id.."", {}, function(rowsChanged)
             TriggerEvent('esx_addonaccount:getSharedAccount', society, function(account)
-                xPlayer.removeAccountMoney('bank', amount)
                 account.addMoney(amount)
-                TriggerClientEvent('esx:showAdvancedNotification', source, 'Fleeca Bank', 'Virement', ('Virement de ~g~%s$~s~ effectué avec succès !'):format(amount), 'CHAR_BANK_FLEECA', 1)
-                TriggerClientEvent('esx:showAdvancedNotification', xTarget.source, 'Fleeca Bank', 'Virement', ('L\'entreprise à reçu un virement de ~g~%s$~s~ !'):format(amount), 'CHAR_BANK_FLEECA', 1)
             end)
         end)
     else
@@ -68,12 +68,12 @@ AddEventHandler('xBilling:payere', function(amount, society, id, sender)
 
     if (not xPlayer) then return end
     if xPlayer.getMoney() >= amount then
+        xPlayer.removeMoney(amount)
+        TriggerClientEvent('esx:showNotification', source, ('Paiment de ~g~%s$~s~ effectué avec succès !'):format(amount))
+        TriggerClientEvent('esx:showNotification', xTarget.source, ('Vous avez reçu un paiment de ~g~%s$~s~ !'):format(amount))
         MySQL.Async.execute("DELETE FROM xBilling WHERE id = "..id.."", {}, function(rowsChanged)
             TriggerEvent('esx_addonaccount:getSharedAccount', society, function(account)
-                xPlayer.removeMoney(amount)
                 account.addMoney(amount)
-                TriggerClientEvent('esx:showNotification', source, ('Paiment de ~g~%s$~s~ effectué avec succès !'):format(amount))
-                TriggerClientEvent('esx:showNotification', xTarget.source, ('Vous avez reçu un paiment de ~g~%s$~s~ !'):format(amount))
             end)
         end)
     else
